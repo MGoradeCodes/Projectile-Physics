@@ -259,6 +259,28 @@ public class Main extends Application {
     }
 
     public void curveCollision(Bullet b, QuadCurve curve, double t) {
-        //collision and normal code
+        double point1X = lerp(
+                curve.getStartX(),
+                curve.getControlX(),
+                t);
+
+        double point1Y = lerp(
+                curve.getStartY(),
+                curve.getControlY(),
+                t);
+
+        double point2X = lerp(
+                curve.getControlX(),
+                curve.getEndX(),
+                t);
+
+        double point2Y = lerp(
+                curve.getControlY(),
+                curve.getEndY(),
+                t);
+
+        double x = lerp(point1X, point2X, t);
+        double y = lerp(point1Y, point2Y, t);
+        System.out.println("HIT at: " + x + ' ' + y );
     }
 }
