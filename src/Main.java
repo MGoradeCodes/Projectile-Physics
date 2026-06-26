@@ -193,23 +193,36 @@ public class Main extends Application {
 
             for (double t = 0; t <= 1; t += 0.01) {
 
-                double x =
-                        (1-t)*(1-t)*curve.getStartX()
-                                + 2*(1-t)*t*curve.getControlX()
-                                + t*t*curve.getEndX();
+                double point1X = lerp(
+                        curve.getStartX(),
+                        curve.getControlX(),
+                        t);
 
-                double y =
-                        (1-t)*(1-t)*curve.getStartY()
-                                + 2*(1-t)*t*curve.getControlY()
-                                + t*t*curve.getEndY();
+                double point1Y = lerp(
+                        curve.getStartY(),
+                        curve.getControlY(),
+                        t);
+
+                double point2X = lerp(
+                        curve.getControlX(),
+                        curve.getEndX(),
+                        t);
+
+                double point2Y = lerp(
+                        curve.getControlY(),
+                        curve.getEndY(),
+                        t);
+
+                double x = lerp(point1X, point2X, t);
+                double y = lerp(point1Y, point2Y, t);
 
                 double dx = b.shape.getCenterX() - x;
                 double dy = b.shape.getCenterY() - y;
 
-                double dist = Math.sqrt(dx*dx + dy*dy);
+                double dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist <= b.shape.getRadius()) {
-                    System.out.println("Hit!");
+                    curveCollision(b, curve, t);
                     break;
                 }
             }
@@ -225,11 +238,15 @@ public class Main extends Application {
         }
     }
 
+    private double lerp(double a, double b, double t) {
+        return a + (b - a) * t;
+    }
+
     // =========================================================
     // STATIC BULLET CLASS
     // =========================================================
 
-    static class Bullet {
+    public static class Bullet {
         Circle shape;
         double vx;
         double vy;
@@ -239,5 +256,9 @@ public class Main extends Application {
             this.vx = vx;
             this.vy = vy;
         }
+    }
+
+    public void curveCollision(Bullet b, QuadCurve curve, double t) {
+        //collision and normal code
     }
 }
