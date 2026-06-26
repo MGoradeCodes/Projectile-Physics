@@ -21,7 +21,7 @@ public class Main extends Application {
     double gravity = 0.5;
     double e = 0.73;
 
-    private List<Bullet> bullets = new ArrayList<>();
+    private final List<Bullet> bullets = new ArrayList<>();
 
     // ===================== ENTRY =====================
     public static void main(String[] args) {
