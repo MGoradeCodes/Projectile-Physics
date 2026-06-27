@@ -283,4 +283,91 @@ public class Main extends Application {
         double y = lerp(point1Y, point2Y, t);
         System.out.println("HIT at: " + x + ' ' + y );
     }
+
+    private void findNormal(
+            double point1X, double point1Y,
+            double point2X, double point2Y,
+            Bullet b,
+            double x, double y) {
+
+        // Tangent
+        double tx = point2X - point1X;
+        double ty = point2Y - point1Y;
+
+        // Normal
+        double nx = -ty;
+        double ny = tx;
+
+        // Normalize
+        double length = Math.sqrt(nx * nx + ny * ny);
+        if (length > 0) {
+            nx /= length;
+            ny /= length;
+        }
+
+        // Make normal face the ball
+        double toBallX = b.shape.getCenterX() - x;
+        double toBallY = b.shape.getCenterY() - y;
+
+        double facing = toBallX * nx + toBallY * ny;
+
+        if (facing < 0) {
+            nx = -nx;
+            ny = -ny;
+        }
+
+        // Velocity along the normal
+        double dot = b.vx * nx + b.vy * ny;
+
+        // Rolling vs bouncing
+        if (Math.abs(dot) < 1.5) {
+
+            // Remove velocity into the surface
+            b.vx -= dot * nx;
+            b.vy -= dot * ny;
+
+            // Friction
+            b.vx *= friction;
+            b.vy *= friction;
+
+            // Kill tiny jitters
+            if (Math.abs(b.vx) < 0.05) b.vx = 0;
+            if (Math.abs(b.vy) < 0.05) b.vy = 0;
+
+        } else {
+
+            // Reflect
+            b.vx -= 2 * dot * nx;
+            b.vy -= 2 * dot * ny;
+
+            // Energy loss
+            b.vx *= e;
+            b.vy *= e;
+        }
+
+        // Push ball out of curve by exact overlap
+        double dx = b.shape.getCenterX() - x;
+        double dy = b.shape.getCenterY() - y;
+        double dist = Math.sqrt(dx * dx + dy * dy);
+
+        double overlap = b.shape.getRadius() - dist+2.0;
+
+        if (overlap > 0) {
+            b.shape.setCenterX(
+                    b.shape.getCenterX() + nx * overlap+0.5);
+
+            b.shape.setCenterY(
+                    b.shape.getCenterY() + ny * overlap+0.5);
+        }
+
+        // Stop microscopic movement
+        double speed = Math.sqrt(
+                b.vx * b.vx +
+                        b.vy * b.vy);
+
+        if (speed < 0.1) {
+            b.vx = 0;
+            b.vy = 0;
+        }
+    }
 }
