@@ -9,6 +9,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Stage;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class Main extends Application {
 
     double gravity = 0.5;
     double e = 0.73;
+
+    double friction = 0.985;
 
     private final List<Bullet> bullets = new ArrayList<>();
 
@@ -191,7 +194,7 @@ public class Main extends Application {
             // Y movement
             b.shape.setCenterY(b.shape.getCenterY() + b.vy);
 
-            for (double t = 0; t <= 1; t += 0.01) {
+            for (double t = 0; t <= 1; t += 0.002) {
 
                 double point1X = lerp(
                         curve.getStartX(),
@@ -227,7 +230,7 @@ public class Main extends Application {
                 }
             }
 
-            // floor collision
+
             if (b.shape.getBoundsInParent().intersects(
                     floor.getBoundsInParent())
                     && b.vy > 0) {
@@ -281,7 +284,16 @@ public class Main extends Application {
 
         double x = lerp(point1X, point2X, t);
         double y = lerp(point1Y, point2Y, t);
+
+
+        double dx = b.shape.getCenterX() - x;
+        double dy = b.shape.getCenterY() - y;
+
+        double dist = Math.sqrt(dx * dx + dy * dy);
+
         System.out.println("HIT at: " + x + ' ' + y );
+        findNormal(point1X, point1Y, point2X, point2Y, b, x, y);
+
     }
 
     private void findNormal(
@@ -290,22 +302,22 @@ public class Main extends Application {
             Bullet b,
             double x, double y) {
 
-        // Tangent
+
         double tx = point2X - point1X;
         double ty = point2Y - point1Y;
 
-        // Normal
+
         double nx = -ty;
         double ny = tx;
 
-        // Normalize
+
         double length = Math.sqrt(nx * nx + ny * ny);
         if (length > 0) {
             nx /= length;
             ny /= length;
         }
 
-        // Make normal face the ball
+
         double toBallX = b.shape.getCenterX() - x;
         double toBallY = b.shape.getCenterY() - y;
 
@@ -316,36 +328,35 @@ public class Main extends Application {
             ny = -ny;
         }
 
-        // Velocity along the normal
+
         double dot = b.vx * nx + b.vy * ny;
 
-        // Rolling vs bouncing
+
         if (Math.abs(dot) < 1.5) {
 
-            // Remove velocity into the surface
+
             b.vx -= dot * nx;
             b.vy -= dot * ny;
 
-            // Friction
+
             b.vx *= friction;
             b.vy *= friction;
 
-            // Kill tiny jitters
+
             if (Math.abs(b.vx) < 0.05) b.vx = 0;
             if (Math.abs(b.vy) < 0.05) b.vy = 0;
 
         } else {
 
-            // Reflect
+
             b.vx -= 2 * dot * nx;
             b.vy -= 2 * dot * ny;
 
-            // Energy loss
+
             b.vx *= e;
             b.vy *= e;
         }
 
-        // Push ball out of curve by exact overlap
         double dx = b.shape.getCenterX() - x;
         double dy = b.shape.getCenterY() - y;
         double dist = Math.sqrt(dx * dx + dy * dy);
@@ -360,7 +371,7 @@ public class Main extends Application {
                     b.shape.getCenterY() + ny * overlap+0.5);
         }
 
-        // Stop microscopic movement
+
         double speed = Math.sqrt(
                 b.vx * b.vx +
                         b.vy * b.vy);
