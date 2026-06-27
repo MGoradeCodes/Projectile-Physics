@@ -145,10 +145,6 @@ public class Main extends Application {
         player.setRotate(Math.toDegrees(angle));
     }
 
-    // =========================================================
-    // BULLET SYSTEM
-    // =========================================================
-
     private void spawnBullet(Rectangle player, Group root) {
 
         Circle bulletShape = createBullet(player);
@@ -177,7 +173,7 @@ public class Main extends Application {
     }
 
     // =========================================================
-    // PHYSICS (ALL IN ONE LOOP)
+    // PHYSICS
     // =========================================================
 
     private void updateBullets(Rectangle floor, QuadCurve curve) {
@@ -244,9 +240,7 @@ public class Main extends Application {
         return a + (b - a) * t;
     }
 
-    // =========================================================
-    // STATIC BULLET CLASS
-    // =========================================================
+
 
     public static class Bullet {
         Circle shape;
