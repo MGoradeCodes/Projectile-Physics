@@ -9,7 +9,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Stage;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
